@@ -1,0 +1,31 @@
+# Environment variables
+.env
+
+# Python virtual environment
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Streamlit specific
+.streamlit/
+
+# Gradio app directory
+gradio_app/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db 
