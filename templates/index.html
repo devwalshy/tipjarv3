@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TipJar - Automated Tip Distribution</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo-container">
+                <h1 class="logo-text">TipJar</h1>
+            </div>
+            <p class="tagline">"If there's a Will, There's a Way!" -Lauren 2025</p>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Multi-step Process Container -->
+            <div class="process-container">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" data-step="upload">
+                        <div class="step-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <span class="step-label">Upload</span>
+                    </div>
+                    <div class="step" data-step="extract">
+                        <div class="step-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <span class="step-label">Extract Data</span>
+                    </div>
+                    <div class="step" data-step="calculate">
+                        <div class="step-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <span class="step-label">Calculate Tips</span>
+                    </div>
+                    <div class="step" data-step="distribute">
+                        <div class="step-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <span class="step-label">Distribution</span>
+                    </div>
+                </div>
+
+                <!-- Step Content -->
+                <div class="step-content-wrapper">
+                    <!-- Step 1: Upload Image -->
+                    <div class="step-content active" id="upload-step">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Upload Schedule Image</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="file-upload-container">
+                                    <div class="file-upload-area" id="drop-area">
+                                        <input type="file" id="fileInput" accept="image/png, image/jpeg, image/jpg" class="file-input">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <p class="upload-text">Drag & drop an image or click to browse</p>
+                                        <p class="upload-hint">Supported formats: JPG, JPEG, PNG</p>
+                                    </div>
+                                    <button id="uploadButton" class="button primary-button" disabled>
+                                        <i class="fas fa-process"></i> Process Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Extract Data -->
+                    <div class="step-content" id="extract-step">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Extracted Tippable Hours</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="two-column-layout">
+                                    <div class="column image-preview-column">
+                                        <h3>Image Preview</h3>
+                                        <div class="image-preview">
+                                            <img id="previewImage" src="" alt="Uploaded Schedule">
+                                        </div>
+                                    </div>
+                                    <div class="column ocr-result-column">
+                                        <h3>OCR Result</h3>
+                                        <div class="ocr-result" id="ocrResult">
+                                            <p class="placeholder-text">OCR text will appear here after processing...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-actions">
+                                    <button id="extractDataButton" class="button primary-button">
+                                        <i class="fas fa-user-clock"></i> Extract Partner Data
+                                    </button>
+                                    <button id="manualEntryToggle" class="button secondary-button">
+                                        <i class="fas fa-edit"></i> Manual Entry
+                                    </button>
+                                    <a id="downloadOcrButton" class="button text-button">
+                                        <i class="fas fa-download"></i> Download OCR Text
+                                    </a>
+                                </div>
+
+                                <!-- Manual Partner Data Entry Form (hidden by default) -->
+                                <div id="manualEntryForm" class="manual-entry-form hidden">
+                                    <h3>Manual Partner Data Entry</h3>
+                                    <div class="form-group">
+                                        <label for="partnerCount">Number of Partners:</label>
+                                        <input type="number" id="partnerCount" min="1" max="20" value="3" class="form-control">
+                                        <button id="updatePartnerCount" class="button mini-button">Update</button>
+                                    </div>
+                                    <div id="partnersContainer" class="partners-container">
+                                        <!-- Partner inputs will be generated here -->
+                                    </div>
+                                    <button id="saveManualData" class="button primary-button">
+                                        <i class="fas fa-save"></i> Save Partner Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Partner Data Display (shown after extraction) -->
+                        <div id="partnerDataCard" class="card hidden">
+                            <div class="card-header">
+                                <h2>Partner Data</h2>
+                                <span id="totalHoursDisplay" class="badge">Total Hours: 0</span>
+                            </div>
+                            <div class="card-body">
+                                <div id="partnerDataTable" class="partner-data-table">
+                                    <!-- Partner data will be displayed here -->
+                                </div>
+                                <div class="card-actions">
+                                    <button id="proceedToCalculation" class="button primary-button">
+                                        <i class="fas fa-arrow-right"></i> Proceed to Tip Calculation
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Calculate Tips -->
+                    <div class="step-content" id="calculate-step">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Tip Calculation</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="tip-input-section">
+                                    <div class="form-group large-input">
+                                        <label for="totalTipAmount">Total Tip Amount ($):</label>
+                                        <input type="number" id="totalTipAmount" min="0" step="10" class="form-control">
+                                    </div>
+                                    <button id="calculateTipsButton" class="button primary-button">
+                                        <i class="fas fa-calculator"></i> Calculate Tips
+                                    </button>
+                                </div>
+                                <div id="calculationInfo" class="calculation-info hidden">
+                                    <p>Hourly Rate: <span id="hourlyRate">$0.00</span> per hour</p>
+                                    <p class="calculation-formula">
+                                        Total Tips: $<span id="tipAmountDisplay">0.00</span> ÷ 
+                                        Total Hours: <span id="hoursAmountDisplay">0.00</span> = 
+                                        <strong>$<span id="rateDisplay">0.00</span></strong> per hour
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Distribution Results -->
+                    <div class="step-content" id="distribute-step">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Tip Distribution Results</h2>
+                            </div>
+                            <div class="card-body">
+                                <div id="distributionResults" class="distribution-results">
+                                    <!-- Results will be displayed here -->
+                                </div>
+                                <div class="card-actions">
+                                    <button id="saveToHistoryButton" class="button primary-button">
+                                        <i class="fas fa-history"></i> Save to History
+                                    </button>
+                                    <a id="downloadHtmlButton" class="button secondary-button">
+                                        <i class="fas fa-download"></i> Download as Table
+                                    </a>
+                                    <button id="copyResultsButton" class="button text-button">
+                                        <i class="fas fa-copy"></i> Copy Results
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- History Section (expandable) -->
+                        <div class="card">
+                            <div class="card-header expandable" id="historyToggle">
+                                <h2>Distribution History</h2>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="card-body hidden" id="historyContent">
+                                <div id="historyContainer" class="history-container">
+                                    <!-- History items will be displayed here -->
+                                    <p class="placeholder-text" id="historyPlaceholder">No history items yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made by William Walsh</p>
+            <p>Starbucks Store# 69600</p>
+        </footer>
+
+        <!-- Notification System -->
+        <div id="notification-container" class="notification-container"></div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+
